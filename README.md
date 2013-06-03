@@ -1,0 +1,22 @@
+# Karenina
+
+If you added up the time you spent waiting for rails to load before you could run your tests, you could have read a russian novel.
+
+
+
+## Installation
+
+Add this line to your application's Gemfile:
+
+group "test"
+    gem 'karenina'
+end
+
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install karenina
+
