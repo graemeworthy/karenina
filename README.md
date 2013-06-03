@@ -13,6 +13,7 @@ Add this line to your application's Gemfile:
     end
 
 And this line to your spec/spec_helper, at the top please
+
     require 'karenina'
 
 
