@@ -5,17 +5,54 @@ require 'stringio'
 require 'rspec/core'
 require File.expand_path('../../lib/karenina', __FILE__)
 
+class Scroller
+
+  def initialize(stringio, height)
+    @io = stringio
+    @offset = 0
+    @height = 15
+  end
+
+  def num_lines
+    @io.rewind
+    @io.lines.map{|x|}.length
+  end
+
+  def up
+    @offset -= 1 unless @offset.zero?
+  end
+
+  def down
+    @offset += 1 unless @offset + @height > num_lines
+  end
+
+  def to_str
+    lines = []
+    @io.rewind
+    @io.lines.collect{|l| lines << l}
+    bottom = @height+@offset < lines.length ? @height+@offset : lines.length
+    top    = @offset
+    #output = "top: #{top}, bottom: #{bottom}, lines: #{num_lines}"
+    lines[top..bottom].join("\n")
+  end
+
+end
 
 class SpecRunner
-  def initialize
-    @tests_output = StringIO.new
+  def initialize(collector)
+    @tests_output = collector || StringIO.new
   end
   def run
       RSpec::Core::Runner.run(["./"], @tests_output, @tests_output)
   end
   def output
-    @tests_output.rewind
-    @tests_output.read
+    if @test_output.kind_of? (StringIO)
+      @tests_output.rewind
+      @tests_output.read
+    else
+      @tests_output.to_str
+    end
+
   end
 end
 
@@ -43,28 +80,36 @@ def novel_display(text)
 end
 
 def warning_display(text)
-  write(11,0, text)
+  write(12,0, text)
 end
 
+
 def test_display(text)
-  write(13,0, text)
+  write(14q,0, text)
 end
 
 init_screen do
-  warning_display('press q to exit, not ctrl-c it will mess things up')
+
   karenina =  Karenina::Reader.new
-  spec_runner   =  SpecRunner.new
+  collector = StringIO.new
+  spec_runner   =  SpecRunner.new(collector)
+  scroller = Scroller.new(collector, Curses.cols)
   threads = []
   threads << Thread.new {spec_runner.run}
 
   loop do
+    Curses.clear
     novel_display(karenina)
-    test_display(spec_runner.output)
+    warning_display('press q to exit, not ctrl-c it will mess things up')
+    test_display(scroller)
       case Curses.getch
-      when Curses::Key::UP   then karenina.up
-      when Curses::Key::DOWN then karenina.down
+      when Curses::Key::UP   then scroller.up
+      when Curses::Key::DOWN then scroller.down
+      when ?j  then karenina.down
+      when ?k  then karenina.up
       when ?q then break
       end
-      sleep(0.01) # keeps it from eating the cpu on loop
+
+
   end
 end
