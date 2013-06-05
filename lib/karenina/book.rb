@@ -26,27 +26,49 @@ module Karenina
         end
     end
 
-    def print()
+    def first_line_num
+      current_line_num - @context_lines > 0 ? current_line_num - @context_lines : 0
+    end
+
+    def last_line_num
+      current_line_num + @context_lines
+    end
+
+    def current_line_num
+      @mark.line
+    end
+
+    def print
+      output = []
       skip_blank
-      current_line = @mark.line
-      first = current_line - @context_lines > 0 ? current_line - @context_lines : 0
-      last  = current_line + @context_lines
-      first.upto(last) {|line|
-        text = lines[line].to_s
-        if line == current_line
-          bold_line(text)
+      first_line_num.upto(last_line_num) {|line|
+        text = @lines[line].to_s.chomp
+        if line == current_line_num
+          output << "#{bold_line(text)}"
         else
-          puts text.white
+          output << "#{text}"
         end
       }
+      output.join("\n") + "\n"
+    end
+
+    def to_str
+      output = []
+      first_line_num.upto(last_line_num) {|line|
+        text = @lines[line].to_s.chomp
+        output << "#{text}"
+      }
+      output.join("\n") + "\n"
     end
 
     def bold_line(text)
+          output = []
           separator = ""
           80.times { separator << "-"}
-          puts separator
-          puts text.white.bold
-          puts separator
+          output << separator
+          output << text
+          output << separator
+          output.join("\n")
     end
   end
 

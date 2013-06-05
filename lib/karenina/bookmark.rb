@@ -11,7 +11,6 @@ module Karenina
     def initialize
       @filename = ENV['HOME'] + '/.karenina_bookmark'
       get_mark
-      increment
     end
 
     def get_mark
@@ -24,6 +23,10 @@ module Karenina
 
     def increment
       File.open(@filename, 'w+') {|f| f.puts @line +=1 }
+    end
+
+    def decrement
+      File.open(@filename, 'w+') {|f| f.puts @line -=1 }
     end
 
   end
