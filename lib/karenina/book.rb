@@ -41,7 +41,7 @@ module Karenina
     def print
       output = []
       skip_blank
-      first_line_num.upto(last_line_num) {|line|
+       printable_line_nums.each {|line|
         text = @lines[line].to_s.chomp
         if line == current_line_num
           output << "#{bold_line(text)}"
@@ -54,11 +54,15 @@ module Karenina
 
     def to_str
       output = []
-      first_line_num.upto(last_line_num) {|line|
+      printable_line_nums.each {|line|
         text = @lines[line].to_s.chomp
         output << "#{text}"
       }
       output.join("\n") + "\n"
+    end
+
+    def printable_line_nums
+      first_line_num.upto(last_line_num)
     end
 
     def bold_line(text)
