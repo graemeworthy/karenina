@@ -32,7 +32,6 @@ class Scroller
     @io.lines.collect{|l| lines << l}
     bottom = @height+@offset < lines.length ? @height+@offset : lines.length
     top    = @offset
-    #output = "top: #{top}, bottom: #{bottom}, lines: #{num_lines}"
     lines[top..bottom].join("\n")
   end
 
@@ -85,7 +84,7 @@ end
 
 
 def test_display(text)
-  write(14q,0, text)
+  write(14,0, text)
 end
 
 init_screen do

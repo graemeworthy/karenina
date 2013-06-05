@@ -5,7 +5,6 @@ require 'karenina/version'
 require 'karenina/book'
 require 'karenina/bookmark'
 require 'karenina/reader'
-#require "colored"
 
 module Karenina
 	TEXT_PATH = File.expand_path( File.join(File.dirname(__FILE__), "..", "text", "from_project_gutenberg.txt",))
