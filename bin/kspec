@@ -1,0 +1,70 @@
+#!/usr/bin/env ruby
+require 'curses'
+
+require 'stringio'
+require 'rspec/core'
+require File.expand_path('../../lib/karenina', __FILE__)
+
+
+class SpecRunner
+  def initialize
+    @tests_output = StringIO.new
+  end
+  def run
+      RSpec::Core::Runner.run(["./"], @tests_output, @tests_output)
+  end
+  def output
+    @tests_output.rewind
+    @tests_output.read
+  end
+end
+
+def init_screen
+
+Curses.noecho # do not show typed keys
+Curses.timeout = 0 # do not block and wait for input
+Curses.init_screen
+  Curses.stdscr.keypad(true) # enable arrow keys
+  begin
+    yield
+  ensure
+    Curses.close_screen
+  end
+end
+
+def write(line, column, text)
+  Curses.setpos(line, column)
+  Curses.addstr(text);
+end
+
+
+def novel_display(text)
+  write(0,0, text)
+end
+
+def warning_display(text)
+  write(11,0, text)
+end
+
+def test_display(text)
+  write(13,0, text)
+end
+
+init_screen do
+  warning_display('press q to exit, not ctrl-c it will mess things up')
+  karenina =  Karenina::Reader.new
+  spec_runner   =  SpecRunner.new
+  threads = []
+  threads << Thread.new {spec_runner.run}
+
+  loop do
+    novel_display(karenina)
+    test_display(spec_runner.output)
+      case Curses.getch
+      when Curses::Key::UP   then karenina.up
+      when Curses::Key::DOWN then karenina.down
+      when ?q then break
+      end
+      sleep(0.01) # keeps it from eating the cpu on loop
+  end
+end
